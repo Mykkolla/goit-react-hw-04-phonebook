@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { nanoid } from 'nanoid';
 import Filter from './Filter/Filter';
-import { ContactForm } from './ContactForm/ContactForm';
+import ContactForm from './ContactForm/ContactForm';
 import ContactList from './ContactList/ContactList';
 import { Layout } from './Style/Layout';
 
@@ -34,10 +34,6 @@ export class PhoneBook extends Component {
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
 
-    // if (existingNames.includes(newContact.name)) {
-    //   alert(`${newContact.name} is already in contacts.`);
-    //   return;
-    // }
     if (existingNames) {
       alert(`${name} is already in contacts.`);
       return;
