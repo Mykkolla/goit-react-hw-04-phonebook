@@ -1,36 +1,30 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { nanoid } from 'nanoid';
 import Filter from './Filter/Filter';
 import ContactForm from './ContactForm/ContactForm';
 import ContactList from './ContactList/ContactList';
 import { Layout } from './Style/Layout';
+import { useState, useEffect } from 'react';
 
-export class PhoneBook extends Component {
-  state = {
-    contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
-    filter: '',
-  };
+export default function PhoneBook() {
+  const initialContacts = [
+    { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+    { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+    { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+    { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+  ];
 
-  componentDidUpdate(prevProps, prevState) {
-    console.log('add');
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
-  componentDidMount() {
-    const contactsMount = JSON.parse(localStorage.getItem('contacts'));
-    if (contactsMount) {
-      this.setState({ contacts: contactsMount });
-    }
-  }
+  const [contacts, setContacts] = useState(
+    JSON.parse(localStorage.getItem('contacts')) ?? initialContacts
+  );
+  const [filter, setFilter] = useState('');
 
-  addContact = ({ name, number }) => {
-    const existingNames = this.state.contacts.some(
+  useEffect(() => {
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
+
+  const addContact = ({ name, number }) => {
+    const existingNames = contacts.some(
       contact => contact.name.toLowerCase() === name.toLowerCase()
     );
 
@@ -44,48 +38,36 @@ export class PhoneBook extends Component {
       number: number,
     };
 
-    this.setState(prevState => ({
-      contacts: [...prevState.contacts, newContact],
-    }));
+    setContacts(prevContacts => [...prevContacts, newContact]);
   };
 
-  deleteContact = idContact => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== idContact),
-    }));
+  const deleteContact = idContact => {
+    setContacts(prevContacts =>
+      prevContacts.filter(contact => contact.id !== idContact)
+    );
   };
 
-  handleFilterChange = event => {
-    this.setState({
-      filter: event.target.value,
-    });
+  const handleFilterChange = event => {
+    setFilter(event.target.value);
   };
 
-  getVisibleContacts = () =>
-    this.state.contacts.filter(contact =>
-      String(contact.name)
-        .toLowerCase()
-        .includes(this.state.filter.toLowerCase())
+  const getVisibleContacts = () =>
+    contacts.filter(contact =>
+      String(contact.name).toLowerCase().includes(filter.toLowerCase())
     );
 
-  render() {
-    const filteredContacts = this.getVisibleContacts();
-
-    return (
-      <Layout>
-        <h1>PhoneBook</h1>
-        <ContactForm onSubmit={this.addContact} />
-        <h2>Contact List</h2>
-        <Filter value={this.state.filter} onChange={this.handleFilterChange} />
-        {this.state.contacts.length > 0 ? (
-          <ContactList
-            contacts={filteredContacts}
-            onDelete={this.deleteContact}
-          />
-        ) : (
-          <p>No contacts yet</p>
-        )}
-      </Layout>
-    );
-  }
+  const filteredContacts = getVisibleContacts();
+  return (
+    <Layout>
+      <h1>PhoneBook</h1>
+      <ContactForm onSubmit={addContact} />
+      <h2>Contact List</h2>
+      <Filter value={filter} onChange={handleFilterChange} />
+      {contacts.length > 0 ? (
+        <ContactList contacts={filteredContacts} onDelete={deleteContact} />
+      ) : (
+        <p>No contacts yet</p>
+      )}
+    </Layout>
+  );
 }

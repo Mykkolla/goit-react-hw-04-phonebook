@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { PhoneBook } from 'components/App';
+import PhoneBook from 'components/App';
 import { GlobalStyle } from './components/Style/Global';
 import { ThemeProvider } from 'styled-components';
 import { theme } from './components/Theme';
